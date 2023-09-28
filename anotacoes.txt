@@ -1,0 +1,143 @@
+Aula 5: Iniciando um projeto com o Grunt
+
+Pasta src (source) é onde o programador trabalhará
+
+para fazer com que os trechos do ambiente de produção sejam executados apenas no ambiente de produção, cria-se o seguinte trecho de código:
+
+grunt.registerTask('build', ['less:production']);
+
+e acrescenta-se o script "build": "grunt build" ao package.json
+
+------------------------------------------------
+
+Aula 6: Observando mudanças com o Grunt
+
+Plugin: npm install --save-dev grunt-contrib-watch
+
+Após o less acrescenta-se: 
+
+watch: {
+            less: {
+                files: ['caminho dos arquivos'],
+                tasks: ['tarefas a serem executadas']
+            }
+        }
+
+O default passa a valer da seguinte forma: grunt.registerTask('default', ['watch']);
+
+------------------------------------------------
+
+Aula 7: Comprimindo HTML com o Grunt
+
+Criando um html para a dist: 
+
+Plugin: npm install --save-dev grunt-replace
+
+replace: {
+            dev: {
+                options: {
+                    patterns: [
+                        {
+                            match: 'ENDERECO_DO_CSS',
+                            replacement: './styles/main.css'
+                        }
+                    ]
+                },
+                files: [
+                    {
+                     expand: true,
+                     flatten: true,
+                     src: ['src/index.html'],
+                     dest: 'dev/'   
+                    }
+                ]
+            }
+        }
+
+No trecho acima será criado um novo arquivo index.html na pasta dev e onde estiver 'ENDERECO_DO_CSS' no html da pasta src, será substituído por './styles/main.css'.
+
+MINIFICANDO O HTML:
+
+Plugin: npm install --save-dev grunt-contrib-htmlmin
+
+grunt.loadNpmTasks('grunt-contrib-htmlmin');
+
+Após o replace, crio o trecho de código abaixo:
+
+htmlmin: {
+            dist: {
+                options: {
+                    removeComments: true,
+                    collapseWhitespace: true
+                },
+                files: {
+                    'caminho destino':'caminho origem'
+                }
+            }
+        }
+
+No replace, repito o código existente, mas mudando dev para dist e realizando as devidas adequações nos endereços fontes e destinos.
+
+dist: {
+                options: {
+                    patterns: [
+                        {
+                            match: 'ENDERECO_DO_CSS',
+                            replacement: './styles/main.min.css'
+                        }
+                    ]
+                },
+                files: [
+                    {
+                     expand: true,
+                     flatten: true,
+                     src: ['prebuild/index.html'],
+                     dest: 'dist/'   
+                    }
+                ]
+            }
+
+E acrescento ao registerTask build as tarefas: 
+
+    grunt.registerTask('build', ['less:production', 'htmlmin:dist', 'replace:dist']);
+
+
+Assim, o meu código primeiro criará a pasta temporária "prebuild" com o arquivo html minificado e posteriormente irá substituir o endereço css pelo arquivo também minificado. Tudo isso no ambiente de produção.
+
+APAGAR A PASTA TEMPORÁRIA APÓS O CARREGAMENTO:
+
+Plugin: npm install --save-dev grunt-contrib-clean
+
+    grunt.loadNpmTasks('grunt-contrib-clean');
+
+Após o htmlmin no initConfig: 
+
+clean: ['nomedapasta']
+
+E adiciona-se o clean também ao registerTask build.
+
+    grunt.registerTask('build', ['less:production', 'htmlmin:dist', 'replace:dist', 'clean']);
+
+------------------------------------------------
+
+Aula 8: JavaScript Math
+
+
+Math.ramdom para gerar o número aleatório
+Math.floor para arredondar sempre para menos
+
+------------------------------------------------
+
+Aula 9: Comprimindo JavaScript com o Grunt
+
+Plugin: npm install --save-dev grunt-contrib-uglify
+
+uglify: {
+            target: {
+                files: {
+                    'caminho destino':'caminho origem'
+                }
+            }
+        }
+
+    grunt.registerTask('build', ['less:production', 'htmlmin:dist', 'replace:dist', 'clean','uglify']);
